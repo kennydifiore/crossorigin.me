@@ -36,7 +36,8 @@ var allowedOriginalHeaders = new RegExp('^' + require('./allowedOriginalHeaders.
         }
     };
 
-var sizeLimit = process.env.SIZE_LIMIT || 2e6; // 2MB - change this to false if you want unlimited file size
+// Disable size limit for now
+var sizeLimit = false; //process.env.SIZE_LIMIT || 2e6; // 2MB - change this to false if you want unlimited file size
 
 var server = http.createServer(function (req, res) {
     var d = domain.create();
@@ -112,10 +113,9 @@ var handler = function handler(req, res) {
     switch (req.url) {
     case '/':
     case '/index.html':
+    	console.log(normalString('Request for web root received from: %s.  Redirected to http://www.careerfairplus.com/'), req.socket.remoteAddress);
         res.writeHead(302, {'Location': 'http://www.careerfairplus.com/'});
-        res.end(function(){
-			console.log(normalString('Request for web root received from: %s.  Redirected to www.careerfairplus.com'), req.socket.remoteAddress);
-		});
+        res.end();
         break;
     case '/favicon.ico':
         res.setHeader('content-type', 'image/x-icon');
