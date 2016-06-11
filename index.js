@@ -112,7 +112,7 @@ var handler = function handler(req, res) {
     switch (req.url) {
     case '/':
     case '/index.html':
-        res.writeHead(302, {'Location': 'http://www.careerfairplus.com/'};
+        res.writeHead(302, {'Location': 'http://www.careerfairplus.com/'});
         res.end(function(){
 			console.log(normalString('Request for web root received from: %s.  Redirected to www.careerfairplus.com'), req.socket.remoteAddress);
 		});
