@@ -1,0 +1,4 @@
+[
+	".*\.?careerfairplus\.com",
+	"careerfairplus-.*\.herokuapp\.com"
+]
