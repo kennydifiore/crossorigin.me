@@ -113,9 +113,10 @@ var handler = function handler(req, res) {
     switch (req.url) {
     case '/':
     case '/index.html':
-    	console.log(normalString('Request for web root received from: %s.  Redirected to http://www.careerfairplus.com/'), req.socket.remoteAddress);
         res.writeHead(302, {'Location': 'http://www.careerfairplus.com/'});
-        res.end();
+        res.end(function() {
+			console.log(normalString('Request for web root received.  Redirected to http://www.careerfairplus.com/'));
+        });
         break;
     case '/favicon.ico':
         res.setHeader('content-type', 'image/x-icon');
