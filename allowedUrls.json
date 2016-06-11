@@ -1,4 +1,2 @@
-[
-	".*\.?careerfairplus\.com",
-	"careerfairplus-.*\.herokuapp\.com"
-]
+[".*\\.?careerfairplus\\.com",
+ "careerfairplus-.*\\.herokuapp\\.com"]
