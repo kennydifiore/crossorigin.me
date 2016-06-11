@@ -111,9 +111,11 @@ var handleOptions = function handleOptions (res, req) {
 var handler = function handler(req, res) {
     switch (req.url) {
     case '/':
-    case '/index.html' :
-        res.setHeader('content-type', 'text/html');
-        acceptsGzip(req, res, index, indexGzip);
+    case '/index.html':
+        res.writeHead(302, {'Location': 'http://www.careerfairplus.com/'};
+        res.end(function(){
+			console.log(normalString('Request for web root received from: %s.  Redirected to www.careerfairplus.com'), req.socket.remoteAddress);
+		});
         break;
     case '/favicon.ico':
         res.setHeader('content-type', 'image/x-icon');
