@@ -24,7 +24,6 @@ var normalString = chalk.yellow;
 
 var allowedOriginalHeaders = new RegExp('^' + require('./allowedOriginalHeaders.json').join('|'), 'i'),
     bannedUrls = new RegExp(require('./bannedUrls.json').join('|'), 'i'),
-    allowedUrls = new RegExp(require('./allowedUrls.json').join('|'), 'i'),
     defaultOptions = {
         gzip:true
     },
@@ -110,7 +109,7 @@ var handleOptions = function handleOptions (res, req) {
 };
 
 var handler = function handler(req, res) {
-    switch (req.url) {
+    switch (bannedUrls.test(req.url) || req.url) {
     case '/':
     case '/index.html':
         res.writeHead(302, {'Location': 'http://www.careerfairplus.com/'});
@@ -126,43 +125,45 @@ var handler = function handler(req, res) {
         res.setHeader('content-type', 'image/png');
         acceptsGzip(req, res, faviconPNG, faviconPNGGZip);
         break;
+    case true:
+        res.writeHead(403);
+        res.end('FORBIDDEN');
+        break;
     default:
-    	// Using a whitelist test instead of a blacklist test.
-    	if(allowedUrls.test(req.url)) {
-			res.setTimeout(25000);
-			res.setHeader('Access-Control-Allow-Origin', '*');
-			res.setHeader('Access-Control-Allow-Credentials', false);
-			res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-			res.setHeader('Expires', new Date(Date.now() + 86400000).toUTCString()); // one day in the future
-			var options = handleOptions(res, req);
-			var r = request(options);
-			r.pipefilter = function(response, dest) {
-				var size = 0;
-				//var ip;
-				response.on('data', function(chunk){
-					size += chunk.length;
-					if (sizeLimit && size > sizeLimit){
-						size = errorString('over max');
-						response.end();
-					}
-				});
-				response.on('end', function(){
-					console.log(normalString('Request for %s, size ' + size + ' bytes'), req.url);
-				});
-				for (var header in response.headers) {
-					if (!allowedOriginalHeaders.test(header)) {
-						dest.removeHeader(header);
-					}
+        res.setTimeout(25000);
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Credentials', false);
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        res.setHeader('Expires', new Date(Date.now() + 86400000).toUTCString()); // one day in the future
+        var options = handleOptions(res, req);
+        var r = request(options);
+        r.pipefilter = function(response, dest) {
+            var size = 0;
+            //var ip;
+            response.on('data', function(chunk){
+                size += chunk.length;
+                if (sizeLimit && size > sizeLimit){
+                    size = errorString('over max');
+                    response.end();
+                }
+            });
+            response.on('end', function(){
+                console.log(normalString('Request for %s, size ' + size + ' bytes'), req.url);
+                /*if (debug){
+                    ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress || req.socket.remoteAddress ||req.connection.socket.remoteAddress;
+                    console.log(chalk.magenta('Originated from ' + req.headers['x-forwarded-for']));
+                }*/
+            });
+            for (var header in response.headers) {
+                if (!allowedOriginalHeaders.test(header)) {
+                    dest.removeHeader(header);
+                }
 
-					if (options.flags.gzip === true && header === 'content-encoding') {
-						dest.setHeader('content-encoding', response.headers[header]);
-					}
-				}
-				r.pipe(res);
-			};
-		} else {
-		    res.writeHead(403);
-        	res.end('FORBIDDEN');
-        }
+                if (options.flags.gzip === true && header === 'content-encoding') {
+                    dest.setHeader('content-encoding', response.headers[header]);
+                }
+            }
+        };
+        r.pipe(res);
     }
 };
