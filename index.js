@@ -112,7 +112,7 @@ var handler = function handler(req, res) {
     switch (bannedUrls.test(req.url) || req.url) {
     case '/':
     case '/index.html':
-        res.writeHead(302, {'Location': 'http://www.careerfairplus.com/'});
+        res.writeHead(302, {'Location': 'https://www.thesalonapps.com/'});
         res.end(function() {
 			console.log(normalString('Request for web root received.  Redirected to http://www.careerfairplus.com/'));
         });
